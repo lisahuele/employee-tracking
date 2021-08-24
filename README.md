@@ -27,8 +27,7 @@ npm  install express sql2
 ```
 
 ## Demo
-![Mock-up](./.png)
-![Mock-up2](./.png)
+![Demo](./src/Demorecord.mov)
 
 ## Built With
 - Node.js
