@@ -7,7 +7,6 @@ A CLI content management system for managing a company's employees using node, i
 ## Contents
 - [Installation](#installation)
 - [Usage](#usage)
-- [Mock Up](#mock-up)
 - [Built With](#built-with)
 - [Questions](#questions)
 - [Credits](#credits)
@@ -25,9 +24,6 @@ Then, ensure you have installed the dependencies with the command:
 ```
 npm  install express sql2
 ```
-
-## Demo
-![Demo](./src/Demorecord.mov)
 
 ## Built With
 - Node.js
