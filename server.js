@@ -88,7 +88,7 @@ function viewAllRoles() {
 };
 //------- VIEW ALL EMPLOYEES ------- //
 function viewAllEmployees() {
-    const sql = `SELECT employees.first_name, employees.last_name, roles.title, roles.salary, departments.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager 
+    const sql = `SELECT employees.first_name, employees.last_name, roles.title, roles.salary, departments.name AS department, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager 
                 FROM employees 
                 INNER JOIN roles ON roles.id = employees.role_id 
                 INNER JOIN departments ON departments.id = roles.department_id 
@@ -102,8 +102,8 @@ function viewAllEmployees() {
 
 //-------- SELECT ROLE -------- //
 var rolesArr = [];
-function selectDepartment() {
-  db.query(`SELECT * FROM departments`, function(err, res) {
+function selectRole() {
+  db.query(`SELECT * FROM roles`, function(err, res) {
     if (err) throw err
     for (var i = 0; i < res.length; i++) {
       rolesArr.push(res[i].title);
@@ -114,8 +114,8 @@ function selectDepartment() {
 }
 //-------- SELECT MANAGER -------- //
 var managersArr = [];
-function manager() {
-  db.query("SELECT first_name, last_name FROM employee WHERE manager_id IS NULL", function(err, res) {
+function selectManager() {
+  db.query(`SELECT first_name, last_name FROM employees WHERE manager_id IS NULL`, function(err, res) {
     if (err) throw err
     for (var i = 0; i < res.length; i++) {
       managersArr.push(res[i].first_name);
@@ -193,3 +193,46 @@ function addRole() {
 };
 
 //-------- ADD EMPLOYEE -------- //
+function addEmployee() {
+    inquirer.prompt([
+        {
+          name: "firstname",
+          type: "input",
+          message: "Enter their first name"
+        },
+        {
+          name: "lastname",
+          type: "input",
+          message: "Enter their last name"
+        },
+        {
+          name: "role",
+          type: "list",
+          message: "What is their role?",
+          choices: selectRole()
+        },
+        {
+            name: "choice",
+            type: "rawlist",
+            message: "Whats their managers name?",
+            choices: selectManager()
+        }
+    ]).then(function (val) {
+        const sql = `INSERT INTO employees (first_name, last_name, manager_id, role_id) VALUES (?,?,?,?)`;
+        const roleId = selectRole().indexOf(val.role) + 1;
+        const managerId = selectManager().indexOf(val.choice) + 1;
+        const params = [val.firstname, val.lastname, managerId, roleId];
+
+        db.query(sql, params, (err, result) => {
+            if(err) throw err;
+            console.log({
+                message: 'Success',
+                changes: result.affectedRows
+            });
+            promptUser();
+        });
+  })
+}
+
+//-------- UPDATE EMPLOYEE -------- //
+
