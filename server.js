@@ -63,7 +63,7 @@ function promptUser() {
             break;
         }
     })
-}
+};
 
 //------- VIEW ALL DEPARTMENTS ------- //
 function viewAllDepartments() {
@@ -111,7 +111,8 @@ function selectRole() {
 
   })
   return rolesArr;
-}
+};
+
 //-------- SELECT MANAGER -------- //
 var managersArr = [];
 function selectManager() {
@@ -123,7 +124,7 @@ function selectManager() {
 
   })
   return managersArr;
-}
+};
 
 //-------- ADD DEPARTMENTS -------- //
 function addDepartment() {
@@ -192,6 +193,48 @@ function addRole() {
     })
 };
 
+//-------- UPDATE EMPLOYEE -------- //
+function updateEmployee() {
+    db.query(`SELECT employees.last_name, roles.title FROM employees JOIN roles ON employees.role_id = roles.id;`, function(err, res) {
+        if (err) throw err
+
+    inquirer.prompt([
+        {
+            name: "lastname",
+            type: "list",
+            message: "What is the employee's last name?",
+            choices: function() {
+                var lastName = [];
+                for (var i = 0; i < res.length; i++) {
+                    lastName.push(res[i].last_name);
+                  }
+                  return lastName;
+                }
+        },
+        {
+            name: "role",
+            type: "rawlist",
+            message: "What is the Employee's new title?",
+            choices: selectRole()
+        }
+    ])
+    .then(function (val) {
+        const sql = `UPDATE employees SET role_id = ? WHERE last_name = ?`;
+        const roleId = selectRole().indexOf(val.role) + 1;
+        const params = [roleId, val.lastname];
+
+        db.query(sql, params, (err, result) => {
+            if(err) throw err;
+            console.log({
+                message: 'Success',
+                changes: result.affectedRows
+            });
+            promptUser();
+        });
+    });
+});
+}
+
 //-------- ADD EMPLOYEE -------- //
 function addEmployee() {
     inquirer.prompt([
@@ -232,7 +275,4 @@ function addEmployee() {
             promptUser();
         });
   })
-}
-
-//-------- UPDATE EMPLOYEE -------- //
-
+};
